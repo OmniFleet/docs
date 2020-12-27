@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: push-gateway
+  labels:
+    app: push-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: push-gateway
+  template:
+    metadata:
+      labels:
+        app: push-gateway
+    spec:
+      containers:
+        - name: push-gateway
+          image: quay.io/prometheus/pushgateway
+          ports:
+            - containerPort: 9091
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: push-gateway
+  labels:
+    app: push-gateway
+spec:
+  ports:
+    - name: metrics
+      port: 9091
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app: push-gateway
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: push-gateway
+    env: dev
+  name: push-gateway-monitor
+  namespace: omnifleet
+spec:
+  endpoints:
+    - port: metrics
+  jobLabel: push-gateway
+  namespaceSelector:
+    matchNames:
+      - omnifleet
+  selector:
+    matchLabels:
+      app: push-gateway

@@ -1,0 +1,8 @@
+grafana:
+  env:
+    GF_SERVER_SERVE_FROM_SUB_PATH: true
+    GF_SERVER_ROOT_URL: http://localhost:3000/grafana
+    GF_SERVER_ROUTER_LOGGING: true
+prometheus:
+  prometheusSpec:
+    retention: 2d
